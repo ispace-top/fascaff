@@ -6,7 +6,11 @@ package com.kerwin.k_utils.sysutil;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Environment;
+
+import com.kerwin.k_utils.logutil.Log;
 
 /**
  * TypeName： sysUtil
@@ -146,5 +150,40 @@ public class SysUtil {
         }
         return sdPath;
     }
-
+    /**
+     * 获取当前软件版本号
+     *
+     * @return
+     */
+    public static String getSystemVersion(Context mContext) {
+        PackageManager packageManager = mContext.getPackageManager();
+        PackageInfo packInfo;
+        String version;
+        try {
+            packInfo = packageManager.getPackageInfo(mContext.getPackageName(), 0);
+            version = packInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            version = "1.0";
+        }
+        return version;
+    }
+    /**
+     * 返回当前程序版本名
+     */
+    public static String getAppVersionName(Context context) {
+        String versionName = "";
+        try {
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            versionName = pi.versionName;
+            int versioncode = pi.versionCode;
+            if (versionName == null || versionName.length() <= 0) {
+                return "";
+            }
+        } catch (Exception e) {
+            Log.e("Exception" + e.toString());
+        }
+        return versionName;
+    }
 }
