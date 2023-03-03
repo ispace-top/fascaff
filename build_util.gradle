@@ -1,0 +1,32 @@
+Properties readProperties(name) {
+    Properties properties = new Properties()
+    try {
+        def file = project.rootProject.file(name)
+        if (file.exists()) {
+            properties.load(file.newDataInputStream())
+        }
+    } catch (Throwable t) {
+//        t.printStackTrace()
+        def file = new File(name)
+        if (file.exists()) {
+            properties.load(file.newDataInputStream())
+        }
+    }
+    return properties
+}
+
+/**
+ * 指定moduleName是否存在
+ * @param moduleName
+ * @return
+ */
+boolean moduleCanBeUsed(String moduleName) {
+    Properties localProperties = readProperties('local.properties')
+    return localProperties.containsKey(moduleName) && localProperties.getProperty(moduleName) == 'true'
+}
+
+ext {
+    // 导出方法，可在其他文件中调用到此文件中的readProperties("...")
+//    readProperties = this.&readProperties
+    moduleCanBeUsed = this.&moduleCanBeUsed
+}

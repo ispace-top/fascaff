@@ -2,9 +2,7 @@ package top.itjl.util;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
-import top.itjl.util.sysutil.StringFormat;
+import top.itjl.util.sys.StringFormat;
 
 /**
  * Example local unit test, which will execute on the development machine (host).

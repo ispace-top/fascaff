@@ -38,9 +38,9 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-                groupId = 'com.github.kindom162'
-                artifactId = 'CommonUtil'
-                version = '0.9'
+                groupId = rootProject.LIB_GROUP_ID
+                artifactId = rootProject.LIB_ARTIFACT_ID
+                version = rootProject.LIB_VERSTION
             }
         }
     }
