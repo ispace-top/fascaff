@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 }
+apply from: file("../build_util.gradle")
 
 android {
     compileSdk 33
@@ -42,11 +43,13 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    implementation project(path: ':lib')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    if (rootProject.SOURCE_COMPLE) {
+    //local.properties中配置SOURCE_COMPLE 来实现源码编译
+    if (moduleCanBeUsed("SOURCE_COMPLE")) {
         implementation project(path: ':lib')
     } else {
         implementation 'com.github.kerwin162:CommonUtil:' + rootProject.COMMON_UTILS_VERSION
