@@ -92,10 +92,36 @@ public class Log {
         }
         content.append("\t");
         if (LogManager.me().parser() != null) {
-            content.append(LogManager.me().parser().parser(contents.length == 1 ? contents[0] : contents));
+            if (contents.length == 1) {
+                if (isBaseClass(contents[0])) {
+                    content.append(contents[0]);
+                } else {
+                    content.append(LogManager.me().parser().parser(contents[0]));
+                }
+            } else {
+                content.append(LogManager.me().parser().parser(contents));
+            }
         } else {
             content.append(contents.toString());
         }
         return content.toString();
+    }
+
+    /**
+     * 判断是否是基础数据类型
+     *
+     * @param content 入参
+     * @return 是否基础类型
+     */
+    private static boolean isBaseClass(Object content) {
+        return content instanceof Integer
+                || content instanceof Byte
+                || content instanceof Long
+                || content instanceof Double
+                || content instanceof Float
+                || content instanceof Character
+                || content instanceof String
+                || content instanceof Short
+                || content instanceof Boolean;
     }
 }
