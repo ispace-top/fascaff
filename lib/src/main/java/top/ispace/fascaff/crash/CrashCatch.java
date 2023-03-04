@@ -9,6 +9,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -18,9 +19,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
-
-import top.ispace.fascaff.log.Log;
 
 /**
  * TypeName： crashCatch
@@ -34,6 +34,7 @@ import top.ispace.fascaff.log.Log;
  */
 @SuppressLint("SimpleDateFormat")
 public class CrashCatch implements UncaughtExceptionHandler {
+	private static final String TAG = "CrashCatch";
 	// 系统默认的UncaughtException处理类
 	private UncaughtExceptionHandler mDefaultHandler;
 	// CrashHandler实例
@@ -80,7 +81,7 @@ public class CrashCatch implements UncaughtExceptionHandler {
 			try {
 				Thread.sleep(3000);
 			} catch (InterruptedException e) {
-				Log.e("error : " + e);
+				Log.e(TAG,"error : " + e);
 			}
 			// 退出程序
 			android.os.Process.killProcess(android.os.Process.myPid());
@@ -130,16 +131,16 @@ public class CrashCatch implements UncaughtExceptionHandler {
 				infos.put("versionCode", versionCode);
 			}
 		} catch (NameNotFoundException e) {
-			Log.e("an error occured when collect package info  " + e);
+			Log.e(TAG,"an error occured when collect package info  " + e);
 		}
 		Field[] fields = Build.class.getDeclaredFields();
 		for (Field field : fields) {
 			try {
 				field.setAccessible(true);
 				infos.put(field.getName(), field.get(null).toString());
-				Log.d(field.getName() + " : " + field.get(null));
+				Log.d(TAG,field.getName() + " : " + field.get(null));
 			} catch (Exception e) {
-				Log.e("an error occured when collect crash info  " + e);
+				Log.e(TAG,"an error occured when collect crash info  " + e);
 			}
 		}
 	}
@@ -172,7 +173,7 @@ public class CrashCatch implements UncaughtExceptionHandler {
 		sb.append(result);
 		try {
 			long timestamp = System.currentTimeMillis();
-			String time = String.format("%tF %tT",new Date());
+			String time = String.format("%tF %tT",new Date(), Locale.getDefault());
 			String fileName = "crash-" + time + "-" + timestamp + ".log";
 			if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 				String path = "/sdcard/crash/";
@@ -186,7 +187,7 @@ public class CrashCatch implements UncaughtExceptionHandler {
 			}
 			return fileName;
 		} catch (Exception e) {
-			Log.e("an error occured while writing file...：" + e);
+			Log.e(TAG,"an error occured while writing file...：" + e);
 		}
 		return null;
 	}

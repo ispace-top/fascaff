@@ -4,20 +4,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import top.ispace.fascaff.log.ILogFormatter;
-import top.ispace.fascaff.log.ILogPrinter;
+import top.ispace.fascaff.log.formatter.ILogFormatter;
+import top.ispace.fascaff.log.parser.JsonParser;
+import top.ispace.fascaff.log.printer.ILogPrinter;
 
 /**
  * @author: jinglong
  * @date: 2023/3/3
  */
 public class LogConfig {
-    boolean enabled;
-    int traceDeep;
-    ILogFormatter formatter;
-    List<ILogPrinter> printers;
+    public String defaultTag;
+    public boolean enabled;
+    public int traceDeep;
+    public ILogFormatter formatter;
+    public List<ILogPrinter> printers = new ArrayList<>();
+    public JsonParser parser;
 
     public LogConfig() {
+        defaultTag = "Fascaff";
     }
 
     public LogConfig enabled(boolean enabled) {
@@ -40,6 +44,11 @@ public class LogConfig {
 
     public LogConfig setFormatter(ILogFormatter formatter) {
         this.formatter = formatter;
+        return this;
+    }
+
+    public LogConfig jsonParser(JsonParser parser) {
+        this.parser = parser;
         return this;
     }
 

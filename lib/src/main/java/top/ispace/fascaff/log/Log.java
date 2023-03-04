@@ -1,241 +1,101 @@
 package top.ispace.fascaff.log;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Date;
 
-import android.annotation.SuppressLint;
-import android.os.Environment;
+import top.ispace.fascaff.log.config.LogConfig;
+import top.ispace.fascaff.log.printer.ILogPrinter;
 
 /**
- * TypeName： Log
- *
- * @author Kerwin
- * @Date 2016年8月16日
- * @Version 2.0
- * <p>
- * 说明： <br>
- * V2.0 <br>
- * 新增原生log(tag,msg);的使用方法，与原生log(tag,msg)使用和展示形式相同;<br>
- * V1.0<br>
- * 1.该类是一个集成了日志本地存储和显示优化的日志工具类。
- * 2.使用默认配置时无需任何设置，按原生log正常使用即可，例：Log.e("sample");
- * 3.该工具类默认配置如下：默认输出路径为sdcar根目录下k-log文件夹，日志文档命名为：[当前时间].txt
- * 4.默认输出日志等级为WARN,如需配置建议在application中配置Log.uotLevel
- * 5.默认日志开关和输出开关均为开启状态，如需设置请在application中配置Log.isShow及Log.isOut属性
- * </p>
+ * @author: jinglong
+ * @date: 2023/3/3
  */
 public class Log {
-    public static final int VERBOSE = 0;
-    public static final int DEBUG = 1;
-    public static final int INFO = 2;
-    public static final int WARN = 3;
-    public static final int ERROR = 4;
-    public static boolean isShow = true;// 是否打印日志
-    public static boolean isOut = true;// 是否输出日志到文件
-    public static int outLevel = WARN;// 输出日志最低等级
-    public static String logPath;// 输出日志路径
 
-    public static void v(String msg) {
-        logPrint(msg, "V", VERBOSE);
+    public static void v(Object... object) {
+        vt(null, object);
     }
 
-    public static void d(String msg) {
-        logPrint(msg, "D", DEBUG);
+
+    public static void d(Object... object) {
+        dt(null, object);
     }
 
-    public static void i(String msg) {
-        logPrint(msg, "I", INFO);
+
+    public static void i(Object... object) {
+        it(null, object);
     }
 
-    public static void w(String msg) {
-        logPrint(msg, "W", WARN);
+
+    public static void w(Object... object) {
+        wt(null, object);
     }
 
-    public static void e(String msg) {
-        logPrint(msg, "E", ERROR);
+
+    public static void e(Object... object) {
+        et(null, object);
     }
 
-    public static void v(String tag, String msg) {
-        logPrint(tag, msg, "V", VERBOSE);
+
+    public static void a(Object... object) {
+        at(null, object);
     }
 
-    public static void d(String tag, String msg) {
-        logPrint(tag, msg, "D", DEBUG);
+
+    public static void vt(String tag, Object... contents) {
+        log(LogManager.me().conf(), LogLevel.VERBOSE, tag, contents);
     }
 
-    public static void i(String tag, String msg) {
-        logPrint(tag, msg, "I", INFO);
+
+    public static void dt(String tag, Object... contents) {
+        log(LogManager.me().conf(), LogLevel.DEBUG, tag, contents);
     }
 
-    public static void w(String tag, String msg) {
-        logPrint(tag, msg, "W", WARN);
+
+    public static void it(String tag, Object... contents) {
+        log(LogManager.me().conf(), LogLevel.INFO, tag, contents);
     }
 
-    public static void e(String tag, String msg) {
-        logPrint(tag, msg, "E", ERROR);
+
+    public static void wt(String tag, Object... contents) {
+        log(LogManager.me().conf(), LogLevel.WARN, tag, contents);
     }
 
-    /**
-     * 日志输出和打印方法
-     *
-     * @param message  需输出的msg
-     * @param level    日志字符等级
-     * @param levelNum 输出日志最低数字等级
-     */
-    private static void logPrint(String message, String level, int levelNum) {
-        StackTraceElement stackTrace = Thread.currentThread().getStackTrace()[4];
-        String tag = getTag(stackTrace);
-        logPrint(tag, message, level, levelNum);
+
+    public static void et(String tag, Object... contents) {
+        log(LogManager.me().conf(), LogLevel.ERROR, tag, contents);
     }
 
-    /**
-     * 日志输出和打印方法
-     *
-     * @param tag      日志TAG标记
-     * @param message  需要输出的massage
-     * @param level    日志字符等级标识
-     * @param levelNum 输出日志最低数字等级
-     */
-    private static void logPrint(String tag, String message, String level, int levelNum) {
-        if (!isShow && !isOut)
-            return;
-        StackTraceElement stackTrace = getTrace();
-        String msgStr = getMassage(stackTrace, message, level);
-        if (isShow) {
-            switch (levelNum) {
-                case VERBOSE:
-                    android.util.Log.v(tag, msgStr);
-                    break;
-                case DEBUG:
-                    android.util.Log.d(tag, msgStr);
-                    break;
-                case INFO:
-                    android.util.Log.i(tag, msgStr);
-                    break;
-                case WARN:
-                    android.util.Log.w(tag, msgStr);
-                    break;
-                case ERROR:
-                    android.util.Log.e(tag, msgStr);
-                    break;
-            }
+
+    public static void at(String tag, Object... contents) {
+        log(LogManager.me().conf(), LogLevel.ASSERT, tag, contents);
+    }
+
+    public static void log(LogConfig config, @LogLevel.Level int level, String tag, Object... contents) {
+        if (!LogManager.me().enabled()) return;
+        if (tag == null) {
+            tag = parserTag();
         }
-        if (isOut && levelNum >= outLevel) {
-            outPut("TAG:" + tag + "  " + msgStr);
+        String content = parserLogContent(contents);
+        for (ILogPrinter printer : LogManager.me().printers()) {
+            printer.print(config, level, tag, content);
         }
     }
 
-    /**
-     * 获取TAG
-     *
-     * @param stackTraceElement
-     * @return
-     */
-    private static String getTag(StackTraceElement stackTraceElement) {
-        String fileName = stackTraceElement.getFileName();
-        return fileName.substring(0, fileName.length() - 5);
+    private static String parserTag() {
+        return LogManager.DEFAULT_TAG_FORMATTER.format(new Throwable().getStackTrace());
     }
 
-    /**
-     * 处理日志信息，添加时间和栈节点信息
-     *
-     * @param stackTraceElement
-     * @param msg
-     * @param level
-     * @return
-     */
-    private static String getMassage(StackTraceElement stackTraceElement, String msg, String level) {
-        StringBuilder msgBuiler = new StringBuilder();
-        String fileName = stackTraceElement.getFileName();
-        // String className = stackTraceElement.getClassName();
-        String time = getTime();
-        String methodName = stackTraceElement.getMethodName();
-        int lineNumber = stackTraceElement.getLineNumber();
-
-        msgBuiler.append(level);
-        msgBuiler.append("[");
-        msgBuiler.append(time).append("] ");
-        msgBuiler.append(fileName).append("(");
-        msgBuiler.append(lineNumber).append(").");
-        // msgBuiler.append(className).append(".");
-        msgBuiler.append(methodName).append("() ");
-        msgBuiler.append(msg);
-        return msgBuiler.toString();
-    }
-
-    /**
-     * 在对应文件中写入字符串
-     *
-     * @param msg
-     */
-    private static void outPut(String msg) {
-        FileWriter filerWriter = null;
-        BufferedWriter bufWriter = null;
-        if (logPath == null || "".equals(logPath)) {
-            String sdPath = "/mnt/sdcard";
-            if (Environment.isExternalStorageEmulated()) {
-                sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-            }
-            logPath = sdPath + "/thinkwin/";
+    private static String parserLogContent(Object[] contents) {
+        StringBuilder content = new StringBuilder();
+        content.append(LogManager.THREAD_INFO_FORMATTER.format(Thread.currentThread()));
+        if (LogManager.me().formatter() != null) {
+            content.append("\t");
+            content.append(LogManager.me().formatter().format(contents));
         }
-        String filePath = logPath + getDate() + ".log";
-
-        File f = new File(filePath);
-        if (!f.getParentFile().exists()) {
-            f.getParentFile().mkdirs();
+        content.append("\t");
+        if (LogManager.me().parser() != null) {
+            content.append(LogManager.me().parser().parser(contents.length == 1 ? contents[0] : contents));
+        } else {
+            content.append(contents.toString());
         }
-        try {
-            filerWriter = new FileWriter(filePath, true);
-            bufWriter = new BufferedWriter(filerWriter);
-            bufWriter.write(msg);
-            bufWriter.newLine();
-            bufWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (bufWriter != null)
-                    bufWriter.close();
-                if (filerWriter != null)
-                    filerWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * 获取“13:25:44”格式的时间字符串
-     *
-     * @return
-     */
-    @SuppressLint("DefaultLocale")
-    private static String getTime() {
-        Date date = new Date();
-        return String.format("%tT", date);
-    }
-
-    /**
-     * 获取“2016-8-15”格式的日期字符串
-     *
-     * @return
-     */
-    private static String getDate() {
-        Date date = new Date();
-        return String.format("%tF", date);
-    }
-
-    private static StackTraceElement getTrace() {
-        StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
-        for (StackTraceElement stackTraceElement : stackTraces) {
-            if (!"Log.java".equals(stackTraceElement.getFileName())
-                    && !"VMStack.java".equals(stackTraceElement.getFileName())
-                    && !"Thread.java".equals(stackTraceElement.getFileName())) {
-                return stackTraceElement;
-            }
-        }
-        return stackTraces[4];
+        return content.toString();
     }
 }
