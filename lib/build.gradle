@@ -2,14 +2,17 @@ plugins {
     id 'com.android.library'
     id 'maven-publish'
 }
-group = 'com.github.kindom162'
+apply from: file("../build_util.gradle")
+apply from: file("../build_env.gradle")
+
+group = 'com.github.ispace-top'
 
 android {
-    compileSdk 31
+    compileSdk COMPIL_SDK
 
     defaultConfig {
-        minSdk 21
-        targetSdk 31
+        minSdk MIN_SDK
+        targetSdk TARGET_SDK
         versionCode 1
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -23,13 +26,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
     testImplementation 'junit:junit:4.13.2'
 }
 
