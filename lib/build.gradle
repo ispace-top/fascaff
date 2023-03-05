@@ -5,6 +5,7 @@ plugins {
 apply from: file("../build_util.gradle")
 apply from: file("../build_env.gradle")
 
+apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.ispace-top'
 
 android {
