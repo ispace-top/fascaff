@@ -36,15 +36,14 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                groupId = rootProject.LIB_GROUP_ID
-                artifactId = rootProject.LIB_ARTIFACT_ID
-                version = rootProject.LIB_VERSTION
-            }
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = rootProject.LIB_GROUP_ID
+            artifactId = rootProject.LIB_ARTIFACT_ID
+            version = rootProject.LIB_VERSTION
+            from components.release
         }
     }
 }
