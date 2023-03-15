@@ -56,6 +56,6 @@ dependencies {
     if (moduleCanBeUsed("SOURCE_COMPLE")) {
         implementation project(path: ':lib')
     } else {
-        implementation 'com.github.kerwin162:CommonUtil:' + rootProject.COMMON_UTILS_VERSION
+        implementation 'com.github.ispace-top:fascaff:'+ rootProject.COMMON_UTILS_VERSION
     }
 }
