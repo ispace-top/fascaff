@@ -21,8 +21,11 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug{
+            minifyEnabled false
         }
     }
     compileOptions {
@@ -36,14 +39,15 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
 
-
-publishing {
-    publications {
-        release(MavenPublication) {
-            groupId = rootProject.LIB_GROUP_ID
-            artifactId = rootProject.LIB_ARTIFACT_ID
-            version = rootProject.LIB_VERSTION
-            from components.release
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId = rootProject.LIB_GROUP_ID
+                artifactId = rootProject.LIB_ARTIFACT_ID
+                version = rootProject.LIB_VERSTION
+                from components.release
+            }
         }
     }
 }
